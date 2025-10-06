@@ -2,8 +2,10 @@
 
 namespace App\Controllers;
 
+use App\Controllers\BaseController;
 use App\Models\SeasonModel;
 use App\Models\LeagueModel;
+use App\Models\LeagueSeasonModel;
 use App\Models\GameModel;
 use App\Models\TeamModel;
 
@@ -11,87 +13,79 @@ class SeasonController extends BaseController
 {
     protected $seasonModel;
     protected $leagueModel;
+    protected $leagueSeasonModel;
     protected $gameModel;
     protected $teamModel;
+    protected $data = [];
 
     public function __construct()
     {
         $this->seasonModel = new SeasonModel();
-        $this->leagueModel = new LeagueModel(); 
-        $this->gameModel   = new GameModel();
-        $this->teamModel   = new TeamModel();
+        $this->leagueModel = new LeagueModel();
+        $this->leagueSeasonModel = new LeagueSeasonModel();
+        $this->gameModel = new GameModel();
+        $this->teamModel = new TeamModel();
     }
 
     public function index()
     {
         $perPage = 25;
-
         $page = $this->request->getVar('page') ?? 1;
 
-        $seasons = $this->seasonModel->orderBy('start', 'DESC')->paginate($perPage, 'default', $page);
+        $this->data['seasons'] = $this->seasonModel
+            ->orderBy('start', 'DESC')
+            ->paginate($perPage, 'default', $page);
 
-        $pager = $this->seasonModel->pager;
+        $this->data['pager'] = $this->seasonModel->pager;
 
-        echo view('seasons/index', ['seasons' => $seasons,'pager' => $pager,]);
+        return view('seasons/index', $this->data);
     }
 
-    public function show($seasonId)
+    public function games($seasonId)
     {
         $season = $this->seasonModel->find($seasonId);
 
-        $leagues = $this->leagueModel
-            ->join('league_season', 'league.id = league_season.id_league')
-            ->where('league_season.id_season', $seasonId)
-            ->select('league.*')
+        $leagueSeasons = $this->leagueSeasonModel
+            ->where('id_season', $seasonId)
             ->findAll();
 
+        $leagueSeasonIds = array_column($leagueSeasons, 'id');
 
-        echo view('seasons/show', [
-            'season' => $season,
-            'leagues' => $leagues,
-        ]);
-    }
-
-    public function matches($seasonId)
-    {
-        $season = $this->seasonModel->find($seasonId);
-        $matches = $this->gameModel
-            ->where('season_id', $seasonId)
+        $games = $this->gameModel
+            ->whereIn('id_league_season', $leagueSeasonIds)
             ->orderBy('round', 'ASC')
             ->findAll();
 
-        $teams = [];
-        foreach ($matches as $match) {
-            if (!isset($teams[$match->home_team])) {
-                $teams[$match->home_team] = $this->teamModel->find($match->home_team);
-            }
-            if (!isset($teams[$match->away_team])) {
-                $teams[$match->away_team] = $this->teamModel->find($match->away_team);
-            }
+        $teamIds = [];
+        foreach ($games as $game) {
+            $teamIds[] = $game->home;
+            $teamIds[] = $game->away;
         }
+        $teamIds = array_unique($teamIds);
 
-        $matchesByRound = [];
-        foreach ($matches as $match) {
-            $matchesByRound[$match->round][] = $match;
-        }
+        $teams = $this->teamModel
+            ->whereIn('id', $teamIds)
+            ->findAll();
+        $teams = array_column($teams, null, 'id');
 
-        echo view('seasons/matches', [
-            'season' => $season,
-            'matchesByRound' => $matchesByRound,
-            'teams' => $teams,
-        ]);
+        $this->data['season'] = $season;
+        $this->data['games'] = $games;
+        $this->data['teams'] = $teams;
+
+        return view('seasons/games', $this->data);
     }
 
     public function matchDetail($matchId)
     {
         $match = $this->gameModel->find($matchId);
-        $homeTeam = $this->teamModel->find($match->home_team);
-        $awayTeam = $this->teamModel->find($match->away_team);
 
-        echo view('seasons/match_detail', [
-            'match' => $match,
-            'homeTeam' => $homeTeam,
-            'awayTeam' => $awayTeam,
-        ]);
+        $homeTeam = $this->teamModel->find($match->home);
+        $awayTeam = $this->teamModel->find($match->away);
+
+        $this->data['match'] = $match;
+        $this->data['homeTeam'] = $homeTeam;
+        $this->data['awayTeam'] = $awayTeam;
+
+        return view('seasons/match_detail', $this->data);
     }
 }

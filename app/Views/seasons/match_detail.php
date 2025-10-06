@@ -2,35 +2,41 @@
 <?= $this->section("content") ?>
 
 <div class="container mt-5">
-    <h1>Detail zápasu</h1>
-    <p><a href="<?= site_url('seasons/matches/' . $match->season_id) ?>">Zpět na zápasy sezóny</a></p>
+    <h1>Match Details</h1>
 
-    <div class="row align-items-center">
-        <div class="col-md-5 text-center">
-            <h3><?= esc($homeTeam->name) ?></h3>
-            <?php if (!empty($homeTeam->logo)): ?>
-                <img src="<?= base_url('uploads/logos/' . $homeTeam->logo) ?>" alt="<?= esc($homeTeam->name) ?>" class="img-fluid" style="max-height: 150px;">
-            <?php endif; ?>
-        </div>
-
-        <div class="col-md-2 text-center">
-            <h2><?= esc($match->home_goals) ?> : <?= esc($match->away_goals) ?></h2>
-            <p>(Poločas: <?= esc($match->home_goals_ht) ?> : <?= esc($match->away_goals_ht) ?>)</p>
-        </div>
-
-        <div class="col-md-5 text-center">
-            <h3><?= esc($awayTeam->name) ?></h3>
-            <?php if (!empty($awayTeam->logo)): ?>
-                <img src="<?= base_url('uploads/logos/' . $awayTeam->logo) ?>" alt="<?= esc($awayTeam->name) ?>" class="img-fluid" style="max-height: 150px;">
-            <?php endif; ?>
-        </div>
-    </div>
-
-    <hr>
-
-    <p><strong>Datum a čas:</strong> <?= date('d.m.Y', $match->date) ?> <?= $match->time ? date('H:i', strtotime($match->time)) : 'Čas není znám' ?></p>
-    <p><strong>Stadion:</strong> <?= esc($match->stadium) ?></p>
-    <p><strong>Počet diváků:</strong> <?= esc($match->attendance) ?></p>
+    <table class="table table-bordered">
+        <tr>
+            <th>Home Team</th>
+            <td><?= $homeTeam->name ?></td>
+        </tr>
+        <tr>
+            <th>Away Team</th>
+            <td><?= $awayTeam->name ?></td>
+        </tr>
+        <tr>
+            <th>Score</th>
+            <td><?= $match->goals_home ?> - <?= $match->goals_away ?></td>
+        </tr>
+        <tr>
+            <th>Round</th>
+            <td><?= $match->round ?></td>
+        </tr>
+        <tr>
+            <th>Date</th>
+            <td><?= $match->date ?></td>
+        </tr>
+        <tr>
+            <th>Time</th>
+            <td><?= $match->time ?></td>
+        </tr>
+        <tr>
+            <th>Stadium</th>
+            <td><?= $match->stadium ?></td>
+        </tr>
+        <tr>
+            <th>Attendance</th>
+            <td><?= $match->attendance ?></td>
+        </tr>
 </div>
 
 <?= $this->endSection() ?>

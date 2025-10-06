@@ -4,19 +4,15 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class GameModel extends Model
+class LeagueSeasonModel extends Model
 {
-    protected $table            = 'game';
+    protected $table            = 'league_season';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $returnType       = 'object';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields = [
-        'id_league_season', 'home', 'away', 'date', 'time', 'round', 
-        'stadium', 'attendance', 'goals_home', 'goals_away', 
-        'ht_goals_home', 'ht_goals_away', 'link', 'finished'
-    ];
+    protected $allowedFields    = [];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
