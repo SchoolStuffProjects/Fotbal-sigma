@@ -37,7 +37,7 @@
     <button type="submit" class="btn btn-primary mt-3">Uložit</button>
 </form>
 
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="https://cdn.tiny.cloud/1/r9nj6084oldjupk4ac7wlyvtucgnwsgummxj7kri3vla2jbs/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 <script>
   tinymce.init({
     selector: 'textarea#text',
